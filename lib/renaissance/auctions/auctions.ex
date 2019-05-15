@@ -1,6 +1,7 @@
 defmodule Renaissance.Auctions do
   import Ecto.{Query, Changeset}
   alias Renaissance.{Auction, Bid, Helpers, Repo}
+  alias Renaissance.Helpers.Utils
 
   def insert(params) do
     params = Helpers.Money.to_money!(params, "starting_amount")
@@ -42,7 +43,7 @@ defmodule Renaissance.Auctions do
   end
 
   def open?(id) do
-    case Repo.get(Auction, id) do
+    case get_nonpreloaded(id) do
       nil -> false
       auction -> Timex.after?(auction.end_auction_at, Timex.now())
     end
@@ -66,5 +67,14 @@ defmodule Renaissance.Auctions do
       bid -> bid.amount
     end
     |> Helpers.Money.to_money()
+  end
+
+  def get_nonpreloaded(nil), do: nil
+
+  def get_nonpreloaded(auction_id) do
+    case Repo.get(Auction, auction_id) do
+      nil -> nil
+      auction -> auction
+    end
   end
 end

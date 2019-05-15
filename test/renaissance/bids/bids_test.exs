@@ -6,9 +6,11 @@ defmodule Renaissance.Test.BidsTest do
     assert Helpers.Money.compare(actual, expected) == :eq
   end
 
-  setup _context do
+  setup do
     {:ok, seller} = Users.insert(%{email: "seller@mail.com", password: "password"})
-    {:ok, bidder} = Users.insert(%{email: "bidder@mail.com", password: "password"})
+    {:ok, bidder_1} = Users.insert(%{email: "bidder@mail.com", password: "password"})
+    {:ok, bidder_2} = Users.insert(%{email: "bidder2@mail.com", password: "password2"})
+    {:ok, bidder_3} = Users.insert(%{email: "bidder3@mail.com", password: "password3"})
 
     end_time = %{"day" => 15, "hour" => 14, "minute" => 3, "month" => 4, "year" => 3019}
 
@@ -21,7 +23,10 @@ defmodule Renaissance.Test.BidsTest do
         "seller_id" => seller.id
       })
 
-    [params: %{"bidder_id" => bidder.id, "auction_id" => auction.id, "amount" => "1.01"}]
+    [
+      params: %{"bidder_id" => bidder_1.id, "auction_id" => auction.id, "amount" => "1.01"},
+      bidders: %{"1" => bidder_1, "2" => bidder_2, "3" => bidder_3}
+    ]
   end
 
   describe "insert/1" do
@@ -42,7 +47,7 @@ defmodule Renaissance.Test.BidsTest do
     end
 
     test "does not insert bid when invalid auction id", %{params: bid_params} do
-      {:error, changeset} = Map.replace!(bid_params, "auction_id", 0) |> Bids.insert()
+      {:error, changeset} = Map.put(bid_params, "auction_id", 0) |> Bids.insert()
 
       assert "An error occured, your bid was not placed." in errors_on(changeset).auction
       refute Repo.exists?(Bid)
@@ -60,18 +65,18 @@ defmodule Renaissance.Test.BidsTest do
     end
   end
 
+  @eight_oh_one %{string: "8.01", money: Money.new(8_01)}
+  @ten_dollars %{string: "10.00", money: Money.new(10_00)}
+  @ten_oh_five %{string: "10.05", money: Money.new(10_05)}
+  @twelve_seventy %{string: "12.70", money: Money.new(12_70)}
+
+  def place_bid(bid_params, amount) do
+    bid_params |> Map.replace!("amount", amount.string) |> Bids.insert()
+  end
+
+  def get_highest(auction_id), do: Bids.get_highest_bid(auction_id)
+
   describe "get_highest_bid/1" do
-    @eight_oh_one %{string: "8.01", money: Money.new(8_01)}
-    @ten_dollars %{string: "10.00", money: Money.new(10_00)}
-    @ten_oh_five %{string: "10.05", money: Money.new(10_05)}
-    @twelve_seventy %{string: "12.70", money: Money.new(12_70)}
-
-    def place_bid(bid_params, amount) do
-      bid_params |> Map.replace!("amount", amount.string) |> Bids.insert()
-    end
-
-    def get_highest(auction_id), do: Bids.get_highest_bid(auction_id)
-
     test "returns nil if no bids exist for the auction", %{params: bid_params} do
       highest = bid_params["auction_id"] |> get_highest()
       assert is_nil(highest)
@@ -102,23 +107,50 @@ defmodule Renaissance.Test.BidsTest do
     end
 
     @tag :sleeps
-    test "returns earliest bid when multiple valid [highest] bids", %{params: bid_params} do
+    test "returns earliest bid when multiple valid [highest] bids", %{
+      params: bid_params,
+      bidders: bidders
+    } do
       auction_id = bid_params["auction_id"]
-      {:ok, bidder_2} = Users.insert(%{email: "bidder2@mail.com", password: "password2"})
-      {:ok, bidder_3} = Users.insert(%{email: "bidder3@mail.com", password: "password3"})
 
       bid_params |> place_bid(@eight_oh_one)
 
       :timer.sleep(100)
-      bid_params |> Map.replace!("bidder_id", bidder_2.id) |> place_bid(@eight_oh_one)
+      bid_params |> Map.put("bidder_id", bidders["2"].id) |> place_bid(@eight_oh_one)
 
       :timer.sleep(400)
-      bid_params |> Map.replace!("bidder_id", bidder_3.id) |> place_bid(@eight_oh_one)
+      bid_params |> Map.put("bidder_id", bidders["3"].id) |> place_bid(@eight_oh_one)
 
       highest = get_highest(auction_id)
 
       assert_amount_equal(highest.amount, @eight_oh_one.money)
       assert highest.bidder_id == bid_params["bidder_id"]
+    end
+  end
+
+  def get_winning(auction_id), do: Bids.get_winning_bid(auction_id)
+
+  # TODO WIP
+  describe "get_winning_bid/1" do
+    test "returns nil when invalid auction id" do
+      assert is_nil(get_winning(0))
+    end
+
+    test "returns nil when auction is open", %{params: bid_params} do
+      auction_id = bid_params["auction_id"]
+      bid_params |> place_bid(@eight_oh_one)
+
+      assert Auctions.open?(auction_id)
+      assert is_nil(get_winning(auction_id))
+    end
+
+    # FIXME TTD WIP
+    @tag :skip
+    test "returns nil when closed without bids", %{params: bid_params} do
+      auction_id = bid_params["auction_id"]
+
+      refute Auctions.open?(auction_id)
+      assert is_nil(get_winning(auction_id))
     end
   end
 end

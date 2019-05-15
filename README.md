@@ -1,5 +1,6 @@
 # Renaissance
-Auctions web app built with Elixir framework Phoenix [![Build Status](https://travis-ci.com/rstein66/ebay-clone.svg?branch=master)](https://travis-ci.com/rstein66/ebay-clone)  
+Auctions web app built with Elixir framework Phoenix  
+[![Build Status](https://travis-ci.com/rstein66/ebay-clone.svg?branch=master)](https://travis-ci.com/rstein66/ebay-clone)  
 
 > :warning: WIP  
 

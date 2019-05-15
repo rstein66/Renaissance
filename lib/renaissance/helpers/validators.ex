@@ -1,6 +1,7 @@
 defmodule Renaissance.Helpers.Validators do
   import Ecto.Changeset
-  alias Renaissance.{Auction, Auctions, Bids, Helpers, Repo}
+  alias Renaissance.{Auctions, Bids, Helpers}
+  alias Renaissance.Helpers.Utils
 
   def validate_starting_amount(changeset) do
     validate_amount(changeset, :starting_amount, Money.new(0))
@@ -30,8 +31,8 @@ defmodule Renaissance.Helpers.Validators do
 
     seller_id =
       get_change(changeset, :auction_id)
-      |> auction_nonpreloaded_map()
-      |> Map.get(:seller_id)
+      |> Auctions.get_nonpreloaded()
+      |> Utils.extract_key(:seller_id)
 
     if seller_id == bidder_id do
       add_error(changeset, field, "can't bid on an item you're selling")
@@ -50,18 +51,9 @@ defmodule Renaissance.Helpers.Validators do
     end
   end
 
-  defp auction_nonpreloaded_map(nil), do: %{}
-
-  defp auction_nonpreloaded_map(auction_id) do
-    case Repo.get(Auction, auction_id) do
-      nil -> %{}
-      auction -> auction
-    end
-  end
-
   defp get_current_amount(auction_id) do
     case Bids.get_highest_bid(auction_id) do
-      nil -> auction_nonpreloaded_map(auction_id) |> Map.get(:starting_amount)
+      nil -> Auctions.get_nonpreloaded(auction_id) |> Utils.extract_key(:starting_amount)
       bid -> bid.amount
     end
   end

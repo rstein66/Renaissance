@@ -1,6 +1,6 @@
 defmodule Renaissance.Bids do
   import Ecto.{Changeset, Query}
-  alias Renaissance.{Bid, Helpers, Repo}
+  alias Renaissance.{Auctions, Bid, Helpers, Repo}
 
   def insert(params) do
     params = Helpers.Money.to_money!(params, "amount")
@@ -37,6 +37,13 @@ defmodule Renaissance.Bids do
     Repo.exists?(from b in Bid, where: b.id == ^id)
   end
 
+  def get!(id) do
+    Bid
+    |> preload(:bidder)
+    |> preload(:auction)
+    |> Repo.get!(id)
+  end
+
   def get_highest_bid(nil), do: nil
 
   def get_highest_bid(auction_id) do
@@ -45,10 +52,12 @@ defmodule Renaissance.Bids do
     |> Repo.one()
   end
 
-  def get!(id) do
-    Bid
-    |> preload(:bidder)
-    |> preload(:auction)
-    |> Repo.get!(id)
+  # TODO WIP
+  def get_winning_bid(auction_id) do
+    if Auctions.exists?(auction_id) and !Auctions.open?(auction_id) do
+      get_highest_bid(auction_id)
+    else
+      nil
+    end
   end
 end
