@@ -13,7 +13,7 @@ defmodule Renaissance.Repo.Migrations.TransitionTableBidsTimestamps do
     rename table(:bids), :created_at, to: :inserted_at
 
     alter table(:bids) do
-      add :inserted_at, :utc_datetime, default: fragment("NOW()")
+      add :updated_at, :utc_datetime, default: fragment("NOW()")
     end
   end
 end
