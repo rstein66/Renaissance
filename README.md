@@ -1,5 +1,5 @@
 # Renaissance
-Auctions web app built with Elixir framework Phoenix
+Auctions web app built with Elixir framework Phoenix [![Build Status](https://travis-ci.com/rstein66/ebay-clone.svg?branch=master)](https://travis-ci.com/rstein66/ebay-clone)  
 
 > :warning: WIP  
 
@@ -60,5 +60,3 @@ Use of [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view)
 ##### Miscellaneous  
 
 - This file was inspired by [PurpleBooth/README-Template.md](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2).  
-
-

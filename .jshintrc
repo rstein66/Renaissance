@@ -1,0 +1,26 @@
+{
+  "esversion": 6,
+  "asi": true,
+
+  "bitwise": true,
+  "curly": true,
+  "eqeqeq": true,
+  "forin": false,
+  "freeze": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "noempty": true,
+  "nonew": false,
+  "plusplus": false,
+  "quotmark": true,
+  "undef": true,
+  "trailing": true,
+  "unused": true,
+
+  "browser": true,
+  "devel": true,
+  "node": true,
+  "nonstandard": false,
+}
