@@ -1,7 +1,6 @@
 defmodule Renaissance.Auctions do
   import Ecto.{Query, Changeset}
   alias Renaissance.{Auction, Bid, Helpers, Repo}
-  alias Renaissance.Helpers.Utils
 
   def insert(params) do
     params = Helpers.Money.to_money!(params, "starting_amount")

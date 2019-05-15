@@ -42,14 +42,14 @@ defmodule Renaissance.Test.BidsTest do
     test "does not insert bid when invalid bidder id", %{params: bid_params} do
       {:error, changeset} = Map.replace!(bid_params, "bidder_id", 0) |> Bids.insert()
 
-      assert "An error occured, your bid was not placed." in errors_on(changeset).auction
+      assert "an error occured; bid wasn't placed" in errors_on(changeset).auction
       refute Repo.exists?(Bid)
     end
 
     test "does not insert bid when invalid auction id", %{params: bid_params} do
       {:error, changeset} = Map.put(bid_params, "auction_id", 0) |> Bids.insert()
 
-      assert "An error occured, your bid was not placed." in errors_on(changeset).auction
+      assert "an error occured; bid wasn't placed" in errors_on(changeset).auction
       refute Repo.exists?(Bid)
     end
   end

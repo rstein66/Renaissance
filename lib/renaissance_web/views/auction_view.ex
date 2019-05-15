@@ -14,7 +14,6 @@ defmodule RenaissanceWeb.AuctionView do
     }
   end
 
-
   def float_amount(amount) do
     Helpers.Money.to_float(amount)
   end

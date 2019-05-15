@@ -10,7 +10,7 @@ defmodule Renaissance.Bids do
         result
 
       {:error, :rollback} ->
-        message = "An error occured, your bid was not placed."
+        message = "an error occured; bid wasn't placed"
         changeset = Bid.changeset(%Bid{}, params)
         {:error, add_error(changeset, :auction, message)}
 
