@@ -1,4 +1,4 @@
-# Renaissance
+# eBay Clone
 Auctions web app built with Elixir framework Phoenix  
 [![Build Status](https://travis-ci.com/rstein66/ebay-clone.svg?branch=master)](https://travis-ci.com/rstein66/ebay-clone)  
 
@@ -8,7 +8,7 @@ Greenfield web app that is similar to the basic functionality of eBay.
 
 ### Installation
 
-Clone [`xray/Renaissance`](https://github.com/xray/Renaissance), and then 
+Clone [`rstein66/ebay-clone`](https://github.com/rstein66/ebay-clone), and then 
 install its dependencies.  
 ```sh
 $ cd PROJECT_ROOT
